@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<title>Vycisa — Catálogos de Proveedores Papsa</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --petrol: #001D34; --dark-blue: #004A78; --bright-blue: #00A2E1;
+  --dark-red: #A12A3F; --bright-red: #E51938; --dark-terra: #DA5B2B;
+  --bright-ora: #F58233; --dark-green: #006B66; --bright-grn: #65C296;
+  --cream: #F2EFDE; --gray-tint: #E6E7E8;
+  --bg: #F5F5F3; --surface: #FFFFFF; --border: #DDDBD4;
+  --text-hi: #001D34; --text-mid: #3A4A58; --text-lo: #7A8896;
+  --shadow: 0 2px 10px rgba(0,29,52,.08); --radius: 6px;
+  --font: 'Libre Franklin', 'Franklin Gothic Medium', 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Consolas', monospace;
+}
+html { scroll-behavior: smooth; }
+body { font-family: var(--font); background: var(--bg); color: var(--text-hi); }
+.masthead {
+  background: var(--petrol); color: #fff; padding: 0 40px; height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 200; border-bottom: 3px solid var(--bright-blue);
+}
+.masthead-left { display: flex; align-items: center; gap: 20px; }
+.logo-chip { display: flex; align-items: center; }
+.logo-chip img { height: 30px; display: block; }
+.hw-sub { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--bright-blue); }
+.masthead-right { display: flex; align-items: center; gap: 12px; }
+.badge-year {
+  background: transparent; border: 1px solid rgba(255,255,255,.3); color: rgba(255,255,255,.75);
+  font-size: 0.62rem; letter-spacing: 0.12em; padding: 4px 10px; border-radius: 2px;
+}
+#prov-sub:empty { display: none; }
+/* ── ENCABEZADO: INICIO + PROVEEDOR ACTIVO ── */
+.btn-home {
+  background: transparent; border: 1px solid rgba(255,255,255,.3);
+  color: rgba(255,255,255,.8); font-family: var(--font);
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 6px 14px; border-radius: 3px; cursor: pointer;
+  display: flex; align-items: center; gap: 7px; transition: all 0.15s;
+}
+.btn-home:hover { border-color: rgba(255,255,255,.7); color: #fff; }
+.prov-current {
+  background: var(--bright-red); color: #fff; font-size: 0.68rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; padding: 6px 14px; border-radius: 3px;
+}
+.prov-current:empty { display: none; }
+
+/* ── PROVEEDORES EN LA BARRA LATERAL ── */
+.prov-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 7px 20px; cursor: pointer;
+  font-size: 0.73rem; font-weight: 600; letter-spacing: 0.04em;
+  color: rgba(255,255,255,.7); text-decoration: none;
+  border-left: 3px solid transparent; transition: background .15s, color .15s;
+}
+.prov-item:hover { background: rgba(255,255,255,.07); color: #fff; }
+.prov-item.active { background: rgba(255,255,255,.1); color: #fff; border-left-color: var(--bright-red); }
+.pi-n {
+  background: rgba(255,255,255,.14); font-size: 0.6rem; font-weight: 600;
+  padding: 1px 8px; border-radius: 10px;
+}
+#cats-label { margin-top: 10px; border-top: 1px solid rgba(255,255,255,.1); padding-top: 14px; }
+.layout { display: flex; min-height: calc(100vh - 64px); }
+.sidebar {
+  width: 250px; flex-shrink: 0; background: var(--petrol); padding: 16px 0 24px;
+  position: sticky; top: 64px; height: calc(100vh - 64px); overflow-y: auto;
+}
+.sidebar-label {
+  font-size: 0.58rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+  color: rgba(255,255,255,.35); padding: 12px 20px 6px;
+}
+.nav-group { display: none; }
+.nav-group.active { display: block; }
+.nav-pill {
+  display: flex; align-items: center; gap: 10px; padding: 6px 20px;
+  font-size: 0.67rem; letter-spacing: 0.02em; color: rgba(255,255,255,.65);
+  text-decoration: none; transition: background 0.15s, color 0.15s; border-left: 3px solid transparent;
+}
+.nav-pill::before {
+  content: ''; display: block; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent); flex-shrink: 0; opacity: 0.6; transition: opacity 0.15s;
+}
+.nav-pill:hover { background: rgba(255,255,255,.07); color: #fff; border-left-color: var(--accent); }
+.nav-pill:hover::before { opacity: 1; }
+.nav-pill.current { background: rgba(255,255,255,.1); color: #fff; border-left-color: var(--accent); }
+.nav-pill.current::before { opacity: 1; }
+.sidebar::-webkit-scrollbar { width: 3px; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 2px; }
+.main { flex: 1; padding: 28px 32px; overflow: hidden; }
+.prov-panel { display: none; }
+.prov-panel.active { display: block; }
+
+/* ── PORTADA ── */
+.home-hero { padding: 26px 4px 22px; }
+.home-hero h1 { font-size: 1.7rem; font-weight: 800; letter-spacing: -0.01em; color: var(--petrol); }
+.home-hero p { margin-top: 8px; font-size: 0.86rem; color: var(--text-mid); max-width: 60ch; line-height: 1.5; }
+.home-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 16px; padding-bottom: 34px;
+}
+
+/* ── RANGOS DE PRECIO (GOOD / BETTER / BEST) ── */
+.tier-head {
+  display: flex; align-items: baseline; gap: 12px;
+  margin: 6px 0 14px; padding-top: 18px; border-top: 1px solid var(--border);
+}
+.tier-head:first-of-type { border-top: none; padding-top: 0; }
+.tier-sign {
+  font-family: var(--font-mono); font-size: 1.15rem; font-weight: 700;
+  letter-spacing: 0.05em; min-width: 54px;
+}
+.tier-1 .tier-sign { color: var(--dark-green); }
+.tier-2 .tier-sign { color: var(--dark-blue); }
+.tier-3 .tier-sign { color: var(--dark-red); }
+.tier-name {
+  font-size: 1.05rem; font-weight: 800; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--petrol);
+}
+.tier-sub { font-size: 0.74rem; color: var(--text-lo); }
+.card-tier {
+  font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700;
+  margin-left: 8px; vertical-align: 2px; color: var(--text-lo);
+}
+.home-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 20px; cursor: pointer;
+  border-top: 3px solid var(--petrol); transition: transform .14s, box-shadow .14s;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.home-card:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(0,29,52,.14); }
+.home-card-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.home-card-name { font-size: 1.05rem; font-weight: 800; letter-spacing: 0.01em; color: var(--petrol); }
+.home-card-sub { font-size: 0.62rem; color: var(--text-lo); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+.home-thumbs {
+  display: flex; gap: 8px; height: 92px; margin: -4px 0 2px;
+}
+.home-thumbs img {
+  flex: 1; min-width: 0; object-fit: contain; background: var(--cream);
+  border-radius: 4px; padding: 6px; height: 92px;
+}
+.home-card-desc { font-size: 0.74rem; color: var(--text-mid); line-height: 1.5; }
+.home-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.home-chip {
+  font-size: 0.6rem; font-weight: 600; letter-spacing: 0.03em;
+  color: var(--dark-blue); background: #E9F0F5; border-radius: 20px;
+  padding: 3px 10px; text-decoration: none; white-space: nowrap;
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis;
+}
+.home-chip:hover { background: var(--dark-blue); color: #fff; }
+.home-card-foot { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
+.home-card-cta {
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--bright-red);
+}
+.home-hits {
+  font-size: 0.66rem; font-weight: 700; color: #fff; background: var(--bright-blue);
+  border-radius: 20px; padding: 3px 10px;
+}
+.home-hits:empty { display: none; }
+
+/* ── VOLVER ARRIBA ── */
+#topbtn {
+  position: fixed; right: 22px; bottom: 22px; z-index: 300;
+  background: var(--petrol); color: #fff; border: none; border-radius: 50%;
+  width: 42px; height: 42px; cursor: pointer; font-size: 1.1rem;
+  box-shadow: 0 4px 14px rgba(0,29,52,.3); display: none;
+}
+#topbtn.show { display: block; }
+.search-wrap {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 24px;
+  background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--dark-blue);
+  border-radius: var(--radius); padding: 10px 16px; box-shadow: var(--shadow);
+}
+.search-wrap svg { color: var(--text-lo); flex-shrink: 0; }
+.search-wrap input {
+  flex: 1; border: none; outline: none; font-size: 0.83rem; font-family: var(--font);
+  color: var(--text-hi); background: transparent;
+}
+.search-wrap input::placeholder { color: var(--text-lo); }
+#result-count { font-size: 0.7rem; color: var(--text-lo); white-space: nowrap; }
+.section {
+  margin-bottom: 28px; border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--border); box-shadow: var(--shadow);
+}
+.section-header { display: flex; align-items: center; justify-content: space-between; padding: 11px 18px; color: #fff; }
+.section-title { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.section-count {
+  font-size: 0.64rem; opacity: 0.6; letter-spacing: 0.06em;
+  background: rgba(255,255,255,.12); padding: 2px 8px; border-radius: 20px;
+}
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1px; background: var(--border); }
+.card { background: var(--surface); display: flex; flex-direction: column; transition: box-shadow 0.12s; position: relative; }
+.card:hover { box-shadow: inset 0 0 0 2px var(--bright-blue); z-index: 1; }
+.card-img {
+  height: 105px; display: flex; align-items: center; justify-content: center;
+  background: var(--cream); padding: 8px; overflow: hidden;
+}
+.card-img img { max-width: 100%; max-height: 90px; object-fit: contain; transition: transform 0.18s; }
+.card:hover .card-img img { transform: scale(1.07); }
+.no-img { color: var(--text-lo); font-size: 1.4rem; }
+.card-body {
+  padding: 8px 10px 10px; border-top: 1px solid var(--border); flex: 1;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.grupo-badge {
+  display: inline-block; font-size: 0.56rem; font-weight: 800; letter-spacing: 0.1em;
+  padding: 2px 6px; border-radius: 2px; text-transform: uppercase; align-self: flex-start;
+}
+.grupo-mt { background: #D6E8F5; color: var(--dark-blue); }
+.grupo-mx { background: #FDE8D2; color: #7A2E00; }
+.grupo-md { background: #F5ECD9; color: #5A3400; }
+.grupo-al { background: #EAE8E2; color: var(--petrol); }
+.grupo-tx { background: #D5EDE8; color: var(--dark-green); }
+.grupo-ac { background: #D5EDE8; color: var(--dark-green); }
+.grupo-lbz { background: #EFE3D7; color: #6B3A1F; }
+.grupo-ais { background: #DCE9E7; color: #0E4D49; }
+.grupo-tch { background: #E3E7F2; color: #27356B; }
+.grupo-req { background: #F2E0E4; color: #7A1F33; }
+.grupo-made { background: #E6E7E8; color: #33383D; }
+.grupo-vai { background: #E3EDE7; color: #1F4A38; }
+.grupo-dmb { background: #EDE9F2; color: #4A3A6B; }
+.grupo-alm { background: #DCE9F2; color: #0F3A5C; }
+.grupo-hwmx { background: #DFF0EE; color: #0F4A46; }
+.grupo-nrd { background: #E8F0DC; color: #3F5A14; }
+.grupo-pan { background: #F2E4EC; color: #6B2A4E; }
+.grupo-stk { background: #FBE9E1; color: #8A3A16; }
+.grupo-acab { background: #EFE8DA; color: #5C4A1F; }
+.grupo-vyc { background: #E0F0F5; color: #0F4A5C; }
+.grupo-nb { background: #E4EBF5; color: #1F3A6B; }
+.grupo-emc { background: #EAEAEA; color: #3A3A3A; }
+.nombre { font-size: 0.66rem; font-weight: 700; color: var(--text-mid); line-height: 1.25; text-transform: uppercase; letter-spacing: 0.03em; }
+.clave {
+  font-family: var(--font-mono); font-size: 0.6rem; font-weight: 600;
+  color: var(--text-hi); line-height: 1.3; word-break: break-all;
+}
+.dims { font-size: 0.6rem; color: var(--text-lo); line-height: 1.3; }
+
+/* ── COPIAR CLAVE ── */
+.cp {
+  background: none; border: none; cursor: pointer; color: var(--text-lo);
+  font-size: 0.72rem; padding: 0 2px; margin-left: 5px; vertical-align: middle; line-height: 1;
+}
+.cp:hover { color: var(--dark-blue); }
+.cp.ok { color: var(--dark-green); }
+
+/* ── VISTA DE TABLA ── */
+#viewtoggle {
+  background: none; border: 1px solid var(--border); border-radius: 4px;
+  color: var(--text-lo); cursor: pointer; padding: 5px 8px; display: flex; align-items: center;
+}
+#viewtoggle:hover, #viewtoggle.active { color: #fff; background: var(--dark-blue); border-color: var(--dark-blue); }
+.tableview .grid { display: block; }
+.tableview .card { flex-direction: row; align-items: center; border-bottom: 1px solid var(--border); }
+.tableview .card-img { display: none; }
+.tableview .card-body {
+  flex-direction: row; align-items: center; gap: 16px; border-top: none; padding: 6px 14px;
+}
+.tableview .grupo-badge { align-self: center; flex-shrink: 0; width: 44px; text-align: center; }
+.tableview .nombre { width: 220px; flex-shrink: 0; }
+.tableview .clave { width: 200px; flex-shrink: 0; font-size: 0.66rem; }
+.tableview .dims { flex: 1; font-size: 0.66rem; }
+
+/* ── FICHA AMPLIADA ── */
+#ficha {
+  position: fixed; inset: 0; background: rgba(0,29,52,.55); z-index: 400;
+  display: none; align-items: center; justify-content: center; padding: 24px;
+}
+#ficha.open { display: flex; }
+.ficha-box {
+  background: var(--surface); border-radius: 8px; max-width: 680px; width: 100%;
+  max-height: 88vh; overflow: auto; box-shadow: 0 18px 60px rgba(0,29,52,.4);
+}
+.ficha-img {
+  background: var(--cream); display: flex; align-items: center; justify-content: center;
+  padding: 24px; min-height: 240px;
+}
+.ficha-img img { max-width: 100%; max-height: 46vh; object-fit: contain; }
+.ficha-body { padding: 18px 24px 22px; display: flex; flex-direction: column; gap: 8px; }
+.ficha-meta { font-size: 0.64rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-lo); }
+.ficha-nombre { font-size: 1.05rem; font-weight: 800; color: var(--petrol); }
+.ficha-clave { font-family: var(--font-mono); font-size: 0.82rem; font-weight: 600; color: var(--dark-blue); }
+.ficha-dims { font-size: 0.8rem; color: var(--text-mid); line-height: 1.5; }
+.ficha-close {
+  position: absolute; top: 14px; right: 18px; background: var(--petrol); color: #fff;
+  border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; font-size: 0.95rem;
+}
+.ficha-wrap { position: relative; }
+@media (max-width: 860px) {
+  .sidebar { display: none; }
+  .main { padding: 16px; }
+  .masthead { padding: 0 16px; height: auto; flex-wrap: wrap; gap: 8px; padding-top: 10px; padding-bottom: 10px; }
+  .logo-chip img { height: 20px; }
+}
+
+.prov-item, .btn-home { text-decoration: none; }
+.card.destacado { box-shadow: inset 0 0 0 3px var(--bright-red); z-index: 2; }
+.ficha-link {
+  margin-top: 6px; align-self: flex-start; display: inline-flex; align-items: center; gap: 7px;
+  background: var(--dark-blue); color: #fff; border: none; border-radius: 4px;
+  font-family: var(--font); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.05em;
+  padding: 7px 14px; cursor: pointer;
+}
+.ficha-link.ok { background: var(--dark-green); }
+.pie-vigencia { margin: 10px 2px 30px; font-size: 0.66rem; color: var(--text-lo); }
+</style>
+</head>
+<body>
+<header class="masthead">
+  <div class="masthead-left">
+    <a class="logo-chip" href="index.html"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWgAAABCCAYAAAB6pUwxAAAbHklEQVR42u2dd7geRdnGf89JIQ1CCVISFIIBUUSISJOWAKEJhKKRGhQbfvohEESsiKhARKPoJyoQIBA6IRBaKBEExEKTFoImIjWhhCSEJKTc3x/z7JXXNzt73npa5r6uc51zdnZnZmdn733mmacYCQkdHJLWBj4EDAW2AQYCA4B+gAHzgbnAy8DTwGPA02b2Zhq9hA44n7sDnwKOBj4M9PS5eyswwcxey841SRfm1NECXG1m9zapgwacBmwOqKTIgIfM7LI2GCQDTgW2AFaU3fuVZnZfA9o4Bti9rP7sPi8zs4ea8OC/A2zs42rAQuBsM3urwW1tD5zgbZSiG/A7M/t7nfX3A/YARvrvTYEeFV6+HPg38FfgBuAeM3u7SfNoa+DrZfO4kcie4WvAK8B04Hkzm1dHnw8F9s+Zl+0J83v8oZmtKOj7EOBkf0/LOetCM3u0Sc+5P/BdYK2yZ90C3Gpmkyus5/3AH3xOPww8ArwLDAH2BJYAY8zsuuyCGE5tIjm2SHok0u7ENvqK7SRpWaQPf5bUswFtHFUwvjf5R6KR97StpOU5bR3ahPGbELmvBZI2q6Pe9SSdLOlJNQ4zJH1H0oZNGIeD1LZYIulfki6VNEJStxr6fL46Jl5wIaOo73sWXP+ZJvLFxpLmRdo9r8I6Bkl6StIzknbJKR8g6XfOS8eR8xUqxbImc+SSyPH32uiLfapLe3nYyZcg9eJm4NlI2V4uvTcSB0Se6cgGT9aBwH6R4uvMbFYtKxpJo4EHgJ8DWzewy0OAs4G/STpFUu8G1r28jSXNnsBgYDRwB3B73sveCpZ20NX/4grOWVEw5s18Firo39IK5neLz+v+wAhgoKRLJF0paaKkc4ANzezLwIXABZK2bFlNdUA7Age1RuD1StFm9g5wTaS4H/DZBqs3Do59DCSt18AhPJygA857eS6voe8f8HG6lKBrbhYGAec7qW3bBaayAfsAd0oa4ySQ0DGxrb83Y8zsJeBA4FgXVAUcD9ztq88zgHnASavdAy3RPa/Ryqm7+CDWi6uABZGyIyX1bdCtfRjYLlI20HVejRi/noTNjTw8AjxUZX27A3cBn67ismU+gWcDc/zvaqTCPYC7JB3VRaZ1P2As8NNGq83a4YPTVbGvz9XbSoSZWWb2eTM7GjgU2ADY2cwWAJOBkavjF3eHAkmzHGMaIEXPAO6JFG/pD64RONCXvzEc0qB2dgE+Him70swqVlFJOgyY5CqI1jATuAQ4jrCZMtSl7cy6Yw/gKOB3wIwK6hsAjJc0pgvN7W8CJ1ZwXkd977syQW8OzHTyzQi6r6QDJA13CfpNghUSwD+AjbqvhgRdifRcLkVPqrPNS4nrgY+XNMnMarYCaEW9kWG4pPUaYHp2LPm6+zcIFhOV9nl/YALQp5VTHwQuAKaa2dzIOXOdwP8MXCVpLSfsLxHXy+MftLGSlpvZL5ow184A/lYnIQpYk2DFsgMwzCWtGH4q6T4ze7rgnD8Ad1Ob5clygv77uJyy2f6BWFAj2b5L2+v02wrd+G+rmWX+HC/3sVoXOMfMnih/UWI4qYlqhhZJD0XavbSJ7e4gaXGVO8sPSOpRZ7trSnouUv87kraqs/6PSVpUwb0cUmc7AyXNqfe5eX9nV7CjP7reFYxbWTxegWXEETXWf0BBvcOaMIcHSRonaWlBuxOayTSSvh1pd2aDN2BzVWIF1leHN7HdjQrm7I8ruP4sSbOy8fENwpmS3iepv6TxkuZK2sjLfyJpzuqm4ohJz08CE1uRoutRcywoqL8vcGSd93UA0KuC8+o1txsJrJ9zfAVwWYUTvT9wEfC+gtPuBIaZ2WXVqEwiY38LwWKmqH89gd9IavQGZY9GT2Aze8nMvkGwvY5ZWh0s6YNNfI+6F6go1iAhD/f6KmjXkjnXE1jgNu1/BtYGNvIV8WHAtNWGoCUV6Z4vAM70JVbepDu1XinaCXp+pGyUO2bUcl/dqviA7CVp3Rrb6enqjTw8RuWbg98Cti8onwR82sxmNpDU3iQ41ZxfcNr7gHENeM5tAjO7EPh9pHgtYHjixA6FBwkmpOdI6gNcB/yqRKXzR+BcV9d9g6Cz/sXqJEGfEpEyZwDXmtnzPmh5+KRLqfW8UM8TrBXysAWwd41VDyFuvVGOQcBuNbazE/HNwSvMbEkFJL+NS34x3A6MLtlIaSShLSd4r/6q4LR9gVGdaE7/EngnUrZD4sQO9UFdCnyNYMN+I/CImZ2XrRDNbIaZfYtgijcW+K6ZPbxaELS7JY+MSc8lbrPjmixFFy2zT6jRRGpfVt1oW0bYNIupKWrBcZGl7Zs+4SrBqa7SycO/gC82g5xLXhIRLB2mFpz2zQaaPjYbs4g7Qg1KtNjhSPoJgv/FZsATroceLekwSWdKehw4CzjDzM6Fjmtu02jEdM/PU+JYYWaPA9dH6tiNEL+gHtxb8EINBz5S5YenhXzzuVddlZCno9y7WjWHb1zEHHtuNbP/VFDHFgS9Wh5WAN8ys5fb4CVZ4kvImEXIRxvwnNsKK4h75HYjoSOS9APAzsCPfPV7DvB/BKe1PwO7mtk52flFBK0m9lNtNSAuPR9SID2X64UvKJj0dUnRZraQ4LiShz5U71k4BPhEzvGHCIbuT0Ukq12rbOdQ8jf1VhBM5SrBSIJDRR7uon5Txmqew7PAbwtOObqTOHz0BTaJlM1dDfmvU3CWmb1lZuPMbDeXpjcFtjazE8uDPRURdIvHR2hp9E8bf91PAXpHpOc8cnmEld4+5diVeAyKSnEtcc/Cz7oNbzXqjTzSu9l1W1Mi11VsbucfpGMixU8Af6pQ0i/S4f/WdcRtiYsJHoix1dJGnYCQ9i8g6GdWQ4JuFmdZszjLzBb7T65FTpGjyv/6krRZapCtm/20JH2cuGnZb/JCUJqZJJ1PvmdeC8G78PbYgFbwQJ6TdCeQZ3e7OSG2wg0V3FtMvfE6MM3/ngKczqrmXntIWrNCfe9OESkdgufgkgrqGEiI45yHWYQd7LZeas6UNI18nfx6BEuTmzusqCgN9mVyS2RlM201JOgfOW81mrNEUJGu09Y3VETQm/lPZ0bMcuOlAlVDpiK4LfLy7uZS9JQ6+nVJhKAheBbeWIFn4QeBHXOO32dmr/rfj7uaY7ucZ7szxZtlGY6NzJO3iOvry7ElwcYzDw/WE9u4TtxFfNN06wYQdFOW3B7o6VLiLvKPAn9ZDQk6c/3vOkuCLquMCtJz7OW70MzmFEhXIoQGzJOSM4uOetzk72elz305hlHZZuF+5FtETC65jyURdU0LFVhz+OZgTB1ym5m9UOH9vp+46++j7ThNniTuWrxFB5rLLZL6SNpe0s9cOv5YwSXnmdliEjo9unIsjpPJj/PwEsGTrTU85C/CPjllu9cjRZvZQk9MkOci2pcQLe6MghfWyHe6eY0QY6GcsE/LUdeMkLRWziZpKQ4mf3NQVBdWtMhr8MV2nCOvEuyI++eUDWhA/WdJ+h/qj8WxLkEnvgnFAbEArqhiZZOQCLpdJI6hxE26LjSz2RWQ6HLXRQ9n1Q2CTBd9R626aIJTzOkEr69yjJJ0bkGapiER9cY9pfnMHI8RNvPK9ciDvY67ImPYg/yAOFDh5mAJinR37Rk8fiFxi51GYKc2vp/bga/XE3grofMQ9NvUHpWqUqmqZ5PqPpl8y42XK5SeM9ztUvTeESl6BHGLj9Y+AM9Lmkq+Lnozl9xjno0jyLfeuCmnnWWSbskhaHP1Rcy78RPENwcnVrmELiLB9jRn60F8d76zhb68Evhas3IvdhK8SXA0a/Szk3PlBrSxWriIoMcSbEWb0aEWQgbbTzRBet6uQHr+dSXSc5kUfQ4hdGWPnBd4jKSpdUjRlxHfLPycpOvLpSG33hgZWa7fH6nrVkIy2XJnnf0KrDmOJj/Yz9yCD0cMrxeUDWjHF3oAcdvszqLDfRY4j5ANuquG6qwUYwgqvWZYcWwI3NfW87WIoBcUxN9tBJE2a2kb0z2/AUzzrLrVYBZhM2loTtke9UjRhED+T5FvcrgHYbPwqYhqohzTCjY+n3S1xA45kvqOlOmtJa1PfBPxdjP7d5X3+WpB2Vbt+EJvSjz62qwOTERvEzJCXwtMWs2l5lLMaxZnuVFAm2dB796KlNsscm5pxhLSpeeYRNrfJclq70vEg8q31CNFm9kiSVcQ3D3L0Yf8zcL9IlLf5IJ2lkqakkPQmTRevrH4KWDjnKpqyjlIiLOxJEKGu0rqXscqpB4UpQF7rgH1L6L2APTdyFfTQYizcki9oVi7IJqpfmgX1/mutkn4jYJJ3YPggNCMl3xvQoblWnC9k3CeJcFnSzcL3Xojz+ztNVp39pjk7ZSPzwhJ/TzBbRa+dHSkjqd8mVct/ulS9KY5ZR91KfrJtpwoHt41lm5sKcGjtF6cUON4QbDmuZl8u96hwFcJwb0S0hen48ON9w9vpzE8zYmtapjZvwi777EleGngns1rUG9keJZg0VGOD/Lf1gZDiVsfXFmLfa3ruGP68d7A59vhuR1EcKDJwwziQa2qwRwze6XGn+f9gxqTwL/t3oQJiaA7jfTcXmEi9yDfXrpSXE7c62y0q4SydtbMOeemCkhyOfmeceU21cdEVBFvU/3mYKV9PK7JGUDKP+a9CBEOY5hiZos6wLJ4MvFQrusDZycKSwTdGaTnjwGfLjhlRYN+VPAijqnDu/A+8iPPQTDnyzwLR9ao3shwG0EvWo79JPX2MKQxC5g7zKyejbO7gemRsnUJTh1tNR9PIp58YBHBZK3d4RY83yO41edhlKRDSeiy6Co66G+Qv5E3H/gCwczLGjRe44AP55QNI+S+u7OGF/FdSVcT9LF5KoBRkl4jZHYpxx8rUG+Uqzl2KTu+ObAt8AHyA72LCnMOFqk5JP2GEM41D0cSvDd/3eSP+d5OejHcYGZPdpSJ7cG1ziN/I7kF+Iln8X4r0Vki6I4oPW9TID1fZWbXNbi9scD4yMsyRtLdNdqjXkVwyV47p2ykqxjyPPImVfGyL5N0Yw5BtxAsRmI6zVo3B8sxATgx8oEDOFfSG2Z2dZPmys7+oYmpwuYTbIo7Gn5DsE7Ky+X4IZ83ZyQ6SyqOjio9571wCyjOP1crritQR2RSdC2S0izi9tRbRV7Alwm21NXgVoKLczmOJ54XcWIjdLIete504htffYCLJB3fBHLei2Axs3HBaWM7kvRcMm7vEByNYqaIX/fgYAmJoDuc9PyZAun5mSa8LAuBX0SKuwHf9QzYteAy8vXcLQQ9bTnu9ozV1eA54G85x/uS7zn4NvVtDpaP35SC8cv6cZGkn0tarwFzpLekMYQN0iJyvpPgPdshYWZTCYGQYmN2nqQ1EqUlgu4s0vMvm9jutQVS9G7UngH8fqqzB76phhddVBfneKqbAjYSZ1IcCbAbwSP0PknH15LEVdIakg4ixBoZS9zZCIJu/ksVJh9oT5xJ3CtzOHH79YRE0G0uPX+UYt1z01L++JJzXMEpNeUudBvjSi0IXqa6iHKluJ387OWrDDN1bg4WrEI+R0iiW4SPEPT9D0v6vqQdJK1ZMCf6SdpO0qk+NjeTv7FaihnA4ZUkvu0AUvQLhKwhMXxP0iaJ1roOOvMm4UnkuzwvJmTJbTaucSkvL7j+Li5FT66h3syzcO1Wzru3BvVGhucJGTeGtXLeMzQpdZKZvSFpFCE34MGtnL61/3wH+I+k51ySzIIwrU+INLYFxfE1yvEIcIyZTe9E8348cBT5iX8HuZR9QqK2JEG3t/Qcy4A9CfhHG0gzRVJ0ZtHRs4Z6ZxL3LKxLvVHSxnJX07SGiQ1y2IiSNDCKkL2mEsuXngTPxwMJ5pNn+M8XWOkZWCk5Xwkc2MnIOVtlfYt8e3YITj/7JmpLBN3e0nPfiPT88zYMWH4N8ezJn6T2DOCXUBw56xXirtOV4i6CWVkM8ysk8boJx8xOJcQYeaoNntmLTujHVhN6toOR9IPE45p3B86pMjt8QickaGuntltakZ63ITg15EqVZvb3NnxRFhC3SDDgmzXurP+plVXAvS591tP3f1GcWPROM/tnG47lrb5s/zbwQhOamA38FNjJzC5u4Efc2ukd+jHw70jZtgT1W9MeVzsKfEb7JVloaet2uwPzIg02O2D5fP9RWbvvFJCzEex1l+f0e7Evldsa1wBf8uV1+Uv/EUL8jKlVzUCzJZLGA2flDQONyzl3PauGIMWl9/HtIBnOA34q6RKCy/nRBJfsXjVWuZQQB/t64Joa4lhXgvdy5nFp+80aq9mSvk+wVjJv30rI4vOSrjKzGU1oflHknufRpEzmZWP6Vg5Jmz+LZkEEk9MeOaTdPDWgpE0jX4o3WkkoWt/dhozRvcoeaAswPyYdOkEP9EEqJ/b3zOzl9liGuL3uWjmTswV4uxY3XJe8N86pU8ArZra0Af1eg5CMNG8yvtTeGTo8NseHCSZkOxI2CjcmmMz1KpFo5B/odwmxSZ4G/kqwEnmqEWNV0MfehGwbecQ0u5k6fH8f3k/Qu7cQYm5n/ejm7/C8JrS7NsEuf0XZO7jU5+aKJt5zLx/vPM6a7RZCzWi3m8+97jmcNbdZiQI6W961hNUY/kFZh2CxsQ4rc1ouJaTimgO82QnsmRs9Luf7SuiIzqpXT0hISOiqBD1VAZun0ehaaElDkJDQ6bGMoH9VGopE0AkJCQkJiaATEhISVl90T0OQkNBlIADP7LMRwZJjsZm9tsqJnr2mEosLt2BY0ZrtuFuV9AZ6Z2EI3Ot3M4IK5vG8vpRcPxjYBngfwaTtGWB6lvHd69+AYMHzgguYuwNDCBvFj5rZE5G6Nwb29L5AyDQ/LW9T1e93V4Ll0EDvyz8JyTFeTNMsISGhclaWbpO0WNImkg6X9Kikpb5x+LakK8s3ECUNknS3l60RqXcjSXdKuqySsAWS+kq6T9JzkvaUdLWkFVqJlySdlHPdAEkXS5qv/8ZS7+O2fl5vv7dFkj4l6Zay8xdJ+m15QC1Jo7ztcvxH0mfLiTyn3gyvSPpimnEJCQnVEvQ7ksY5qU2RdIqkMZLudXL5p6QPlVzTXdIDXrZbpN7jvXxchf1YU9KbkpZLesGvnSZpvBNrhtNKpVVJ1/vxeU7UP/Tfc/z405L6O0HP8GOv+u8bJJ3l95x9DMZnKwRJH5e00I9PkPR1H5e7/NgC905GUot/sCTpZUnf9Q/eiSXjuNhzoCYkJCRURIxTSiTOr5SV9ZD0My+/ozSxsaTRfvxXeeoKSbdKWiZpuyoIOiPOZZKOcbUEkvqU9GN+9rGQtLUT+hJJw8rq207S637Nrv5RmV5S/6fLzj/R61ohabgfy9ocX3Zud0mTS+9f0oaS3vVje5Wd31vS373sC2nWJSQkVEvQF0XK15D0FyeunUqOry/pNV/+r1N2zWYued7vOtlqCfqKiArkWS//th/b1aX7qyN1/s3PH+nSdkbQ1+ec2yLpT6VSv6tnJOmynPOHepzxI/z/TSRd52qSbjnn3+B1fbOtnm3aJExI6PzIYnFcnFsYYrtcTvA23BN42I+/Lukm4MuEXJqlpHcAwaV+Qo0u/7fk9GOhpKmERLef8MMPAVtmbbhqInOf/zghvGwebs+pf4Wk2wgbfNv44SwWyZGSREjO/JiZzTGzR4FHS65/EU8C4iuI/oTN1o1YGXIgG+9E0AkJCRUT9FLi6bAgJCeAVTOqX+kEfXRG0K6WOJxgvXBLlX1pIQQzi6VJm+m/+5WQak/frBvh5L0JwZW/V+ReISSdKKp/Ayf73/vHZxghJdhoYI6kx4C7gRs9BnsmJa8NfJEQ/naI9yMLkNTmjkCJoBMSug6K/BrmE4IblceJ/ouT9z6SBjtZbUmIZ351kVlcAVaQnzkeQkCnUrXBAGAisI8fWgS8RAh49Sfg2IgUHQsCtbSETFt8lXAQITrioS65DwL29Z/TJZ1gZjd7XyYTMiJBMK17jBDWdRohauXwjvJAExISOheKJLy1/H2fW6YWeM+l6L4uNWbqjZ7AhBr70EI8s02WqT0LDXqak/PrLrluCQw1s33M7Czi4YfXiRzPMre/kdlPm9lCM5tgZocRYmXvAfzAiXcAMNZziJ7g5DzHx2Kome1nZl8xs2t8RdFhvrgJCQmdh5i7s2qs4lJs5b+fzSmbBCwARnn41FHAdOCBGvvSzYk2D5lFyLOuSskk0nFmdpGZvejp5PBs7v0iH6Ghkfqz+ObTvY4fuNndBk7Wb5rZ/U7+o1yiH0TQM++cqX3M7GZPyFGKgYmgExISalEptLSy/D7Kz1slk7onMriDsCl3qJPfRM9/WCuOW4W5g/3wCP/3HoI+OdMz50mnhwODV3bTlrMyG/0xTuCl9W/DygTEWZKMIwlJPvbOqX+uE/4SV8lkXpV9cvp+XMFHISEhISEisgZvvxXu6bZ9TvlJbh42KXPgyDnnQK/jeXd62aKGfpSa2UnSzyUNltRP0jBJT/jxv0rq49dc7ceelfRJP3dLl3wXl9R1mJ//15JjkyXtLGlTdyjJTPD+nnkTuhmd3HHmM+4puI57Ok7zsmv93JNLnFdOdSeX4ZIudLvr5ZmjjVt5XOsOLCPTLExISIgR45OS/uH20PMlnS1pP0lHSJropDJd0gcL6ujnHnty07ta+rGm21UvKyHjdyXNLnP33qHkmu0lveFly9178D3//zq/L0k6vIygp5bUubDk75mShpbUv56kh0vK57m3Y4anMjd4J+57Im7eF0m60f8+3Qk6c00/Jc3ChISEGDE+7K7L/d1FulTyXO6S3uAK6rnIrzmkDoJ+1SXxEe5u/g/3Bpwh6fd5krmkHd0JZKakf3v8jdHumDLFSfXgMoLe16XmqZIek/SgpLGSNsmpf4C7bU91SX26E/GZkjYsO7e/E/DN7nn5B0l7e9np7rJ+jBP0bZIekfSZNAsTEhJixDjA82Jm/2/mKotDJG1VYR19JD3jUnSfGvvRq0QK392P9XYpds0Krl/LnUNKj63rLti9ygh6/7J2u1fYx77luusq7q+7t9XN/+9Z+n8zkOygExI6OcqTLJvZLGBWldV8lWDpMdrM3q31W8HKjbYsnOkiKsx6nZekOifhspXW7+csrmKsFtYxzssI2Wuy/99r9rNNVhwJCUkC3ws4k+ACfn2DhL5muUMvJlhdLEtPLiEhoSsTc19JnyvZONu+zvpaJH3MLSvWalKfB0v6qKR+6QkmJCR0ZYI+t8SyYq80IgkJCQkdh6CPdDO8IWk0Oib+H35PgRdKFeXnAAAAAElFTkSuQmCC" alt="Haworth by Papsa"></a>
+    <span class="hw-sub">Catálogos de Proveedores</span>
+  </div>
+  <div class="masthead-right">
+    <a class="btn-home" href="index.html">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+        <path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V21h13V9.5"/></svg>
+      Inicio
+    </a>
+    <span class="prov-current">Vycisa</span>
+    <span class="badge-year">Lista Jul 2025 V3</span>
+  </div>
+</header>
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sidebar-label">Proveedores</div>
+<a class="prov-item" href="ais.html">AIS<span class="pi-n">36</span></a>
+<a class="prov-item" href="allermuir.html">Allermuir<span class="pi-n">1236</span></a>
+<a class="prov-item" href="dimob.html">Dimob<span class="pi-n">96</span></a>
+<a class="prov-item" href="emeco.html">Emeco<span class="pi-n">208</span></a>
+<a class="prov-item" href="forma.html">Forma<span class="pi-n">875</span></a>
+<a class="prov-item" href="hwmx.html">HWMX Metropolitan<span class="pi-n">9</span></a>
+<a class="prov-item" href="nardi.html">HWMX Nardi<span class="pi-n">57</span></a>
+<a class="prov-item" href="labenze.html">Labenze<span class="pi-n">426</span></a>
+<a class="prov-item" href="panorama.html">Labenze | Panorama<span class="pi-n">90</span></a>
+<a class="prov-item" href="made.html">Made Design<span class="pi-n">125</span></a>
+<a class="prov-item" href="nacionalbancas.html">Nacional de Bancas<span class="pi-n">203</span></a>
+<a class="prov-item" href="requiez.html">Requiez<span class="pi-n">315</span></a>
+<a class="prov-item" href="stockmerx.html">Stock Merx<span class="pi-n">15</span></a>
+<a class="prov-item" href="technochairs.html">Technochairs<span class="pi-n">214</span></a>
+<a class="prov-item" href="vaiven.html">Vaivén<span class="pi-n">236</span></a>
+<a class="prov-item active" href="vycisa.html">Vycisa<span class="pi-n">117</span></a>
+
+    <div class="sidebar-label">Categorías</div>
+    <div class="nav-group active">
+    <a href="#VYCISA_CRISTAL_TEMPLADO_CLARO" class="nav-pill" style="--accent:#004A78">CRISTAL TEMPLADO CLARO</a>
+    <a href="#VYCISA_CRISTAL_TEMPLADO_SATINADO" class="nav-pill" style="--accent:#006B66">CRISTAL TEMPLADO SATINADO</a>
+    <a href="#VYCISA_CRISTAL_LAMINADO_3_3" class="nav-pill" style="--accent:#DA5B2B">CRISTAL LAMINADO 3+3</a>
+    </div>
+  </nav>
+  <main class="main">
+    <div class="search-wrap">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="text" id="search" placeholder="Buscar en Vycisa por clave, modelo o dimensión…" oninput="filterCards()">
+      <span id="result-count"></span>
+      <button id="viewtoggle" onclick="toggleView()" title="Cambiar vista tarjetas/tabla">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="section" id="VYCISA_CRISTAL_TEMPLADO_CLARO" data-proveedor="VYCISA">
+      <div class="section-header" style="background:#004A78">
+        <span class="section-title">CRISTAL TEMPLADO CLARO</span>
+        <span class="section-count">30 productos</span>
+      </div>
+      <div class="grid">
+        <div id="p-CR6-20610-C" class="card" data-pg="1">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado de 6 mm</div>
+            <div class="clave">CR6-20610-C<button class="cp" data-clave="CR6-20610-C" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 610 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado claro</div>
+          </div>
+        </div>
+        <div id="p-CR6-20760-C" class="card" data-pg="1">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado de 6 mm</div>
+            <div class="clave">CR6-20760-C<button class="cp" data-clave="CR6-20760-C" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 760 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado claro</div>
+          </div>
+        </div>
+        <div id="p-CR6-20910-C" class="card" data-pg="1">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado de 6 mm</div>
+            <div class="clave">CR6-20910-C<button class="cp" data-clave="CR6-20910-C" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 910 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado claro</div>
+          </div>
+        </div>
+        <div id="p-CR6-20100-C" class="card" data-pg="10">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado de 6 mm</div>
+            <div class="clave">CR6-20100-C<button class="cp" data-clave="CR6-20100-C" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 1000 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado claro</div>
+          </div>
+        </div>
+        <div id="p-CR6-20107-C" class="card" data-pg="1">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado de 6 mm</div>
+            <div class="clave">CR6-20107-C<button class="cp" data-clave="CR6-20107-C" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 1070 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado claro</div>
+          </div>
+        </div>
+        <div id="p-CR6-20122-C" class="card" data-pg="1">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado de 6 mm</div>
+            <div class="clave">CR6-20122-C<button class="cp" data-clave="CR6-20122-C" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 1220 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado claro</div>
+          </div>
+        </div>
+        <div id="p-CR6-20137-C" class="card" data-pg="1">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado de 6 mm</div>
+            <div class="clave">CR6-20137-C<button class="cp" data-clave="CR6-20137-C" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 1370 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado claro</div>
+          </div>
+        </div>
+        <div id="p-CR6-20152-C" class="card" data-pg="1">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado de 6 mm</div>
+            <div class="clave">CR6-20152-C<button class="cp" data-clave="CR6-20152-C" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 1520 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado claro</div>
+          </div>
+        </div>
+        <div id="p-CR6-20167-C" class="card" data-pg="1">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado de 6 mm</div>
+            <div class="clave">CR6-20167-C<button class="cp" data-clave="CR6-20167-C" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 1670 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado claro</div>
+          </div>
+        </div>
+        <div id="p-CR6-20183-C" class="card" data-pg="1">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado de 6 mm</div>
+            <div class="clave">CR6-20183-C<button class="cp" data-clave="CR6-20183-C" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 1830 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado claro</div>
+          </div>
+        </div>
+        <div id="p-CR6-30610-C" class="card" data-pg="1">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado de 6 mm</div>
+            <div class="clave">CR6-30610-C<button class="cp" data-clave="CR6-30610-C" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 610 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado claro</div>
+          </div>
+        </div>
+        <div id="p-CR6-30760-C" class="card" data-pg="1">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado de 6 mm</div>
+            <div class="clave">CR6-30760-C<button class="cp" data-clave="CR6-30760-C" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 760 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado claro</div>
+          </div>
+        </div>
+        <div id="p-CR6-30910-C" class="card" data-pg="1">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado de 6 mm</div>
+            <div class="clave">CR6-30910-C<button class="cp" data-clave="CR6-30910-C" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 910 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado claro</div>
+          </div>
+        </div>
+        <div id="p-CR6-30100-C" class="card" data-pg="10">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado de 6 mm</div>
+            <div class="clave">CR6-30100-C<button class="cp" data-clave="CR6-30100-C" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 1000 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado claro</div>
+          </div>
+        </div>
+        <div id="p-CR6-30107-C" class="card" data-pg="1">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado de 6 mm</div>
+            <div class="clave">CR6-30107-C<button class="cp" data-clave="CR6-30107-C" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 1070 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado claro</div>
+          </div>
+        </div>
+        <div id="p-CR6-30122-C" class="card" data-pg="1">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado de 6 mm</div>
+            <div class="clave">CR6-30122-C<button class="cp" data-clave="CR6-30122-C" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 1220 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado claro</div>
+          </div>
+        </div>
+        <div id="p-CR6-30137-C" class="card" data-pg="1">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado de 6 mm</div>
+            <div class="clave">CR6-30137-C<button class="cp" data-clave="CR6-30137-C" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 1370 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado claro</div>
+          </div>
+        </div>
+        <div id="p-CR6-30152-C" class="card" data-pg="2">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado de 6 mm</div>
+            <div class="clave">CR6-30152-C<button class="cp" data-clave="CR6-30152-C" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 1520 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado claro</div>
+          </div>
+        </div>
+        <div id="p-CR6-30167-C" class="card" data-pg="2">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado de 6 mm</div>
+            <div class="clave">CR6-30167-C<button class="cp" data-clave="CR6-30167-C" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 1670 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado claro</div>
+          </div>
+        </div>
+        <div id="p-CR6-30183-C" class="card" data-pg="2">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado de 6 mm</div>
+            <div class="clave">CR6-30183-C<button class="cp" data-clave="CR6-30183-C" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 1830 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado claro</div>
+          </div>
+        </div>
+        <div id="p-CR6-40610-C" class="card" data-pg="2">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado de 6 mm</div>
+            <div class="clave">CR6-40610-C<button class="cp" data-clave="CR6-40610-C" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 610 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado claro</div>
+          </div>
+        </div>
+        <div id="p-CR6-40760-C" class="card" data-pg="2">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado de 6 mm</div>
+            <div class="clave">CR6-40760-C<button class="cp" data-clave="CR6-40760-C" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 760 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado claro</div>
+          </div>
+        </div>
+        <div id="p-CR6-40910-C" class="card" data-pg="2">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado de 6 mm</div>
+            <div class="clave">CR6-40910-C<button class="cp" data-clave="CR6-40910-C" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 910 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado claro</div>
+          </div>
+        </div>
+        <div id="p-CR6-40100-C" class="card" data-pg="10">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado de 6 mm</div>
+            <div class="clave">CR6-40100-C<button class="cp" data-clave="CR6-40100-C" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 1000 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado claro</div>
+          </div>
+        </div>
+        <div id="p-CR6-40107-C" class="card" data-pg="2">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado de 6 mm</div>
+            <div class="clave">CR6-40107-C<button class="cp" data-clave="CR6-40107-C" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 1070 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado claro</div>
+          </div>
+        </div>
+        <div id="p-CR6-40122-C" class="card" data-pg="2">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado de 6 mm</div>
+            <div class="clave">CR6-40122-C<button class="cp" data-clave="CR6-40122-C" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 1220 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado claro</div>
+          </div>
+        </div>
+        <div id="p-CR6-40137-C" class="card" data-pg="2">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado de 6 mm</div>
+            <div class="clave">CR6-40137-C<button class="cp" data-clave="CR6-40137-C" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 1370 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado claro</div>
+          </div>
+        </div>
+        <div id="p-CR6-40152-C" class="card" data-pg="2">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado de 6 mm</div>
+            <div class="clave">CR6-40152-C<button class="cp" data-clave="CR6-40152-C" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 1520 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado claro</div>
+          </div>
+        </div>
+        <div id="p-CR6-40167-C" class="card" data-pg="2">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado de 6 mm</div>
+            <div class="clave">CR6-40167-C<button class="cp" data-clave="CR6-40167-C" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 1670 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado claro</div>
+          </div>
+        </div>
+        <div id="p-CR6-40183-C" class="card" data-pg="2">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado de 6 mm</div>
+            <div class="clave">CR6-40183-C<button class="cp" data-clave="CR6-40183-C" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 1830 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado claro</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" id="VYCISA_CRISTAL_TEMPLADO_SATINADO" data-proveedor="VYCISA">
+      <div class="section-header" style="background:#006B66">
+        <span class="section-title">CRISTAL TEMPLADO SATINADO</span>
+        <span class="section-count">27 productos</span>
+      </div>
+      <div class="grid">
+        <div id="p-CR6-20610-S" class="card" data-pg="2">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado satinado de 6 mm</div>
+            <div class="clave">CR6-20610-S<button class="cp" data-clave="CR6-20610-S" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 610 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado satinado a 2 caras</div>
+          </div>
+        </div>
+        <div id="p-CR6-20760-S" class="card" data-pg="2">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado satinado de 6 mm</div>
+            <div class="clave">CR6-20760-S<button class="cp" data-clave="CR6-20760-S" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 760 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado satinado a 2 caras</div>
+          </div>
+        </div>
+        <div id="p-CR6-20910-S" class="card" data-pg="2">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado satinado de 6 mm</div>
+            <div class="clave">CR6-20910-S<button class="cp" data-clave="CR6-20910-S" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 910 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado satinado a 2 caras</div>
+          </div>
+        </div>
+        <div id="p-CR6-20107-S" class="card" data-pg="2">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado satinado de 6 mm</div>
+            <div class="clave">CR6-20107-S<button class="cp" data-clave="CR6-20107-S" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 1070 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado satinado a 2 caras</div>
+          </div>
+        </div>
+        <div id="p-CR6-20122-S" class="card" data-pg="2">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado satinado de 6 mm</div>
+            <div class="clave">CR6-20122-S<button class="cp" data-clave="CR6-20122-S" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 1220 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado satinado a 2 caras</div>
+          </div>
+        </div>
+        <div id="p-CR6-20137-S" class="card" data-pg="2">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado satinado de 6 mm</div>
+            <div class="clave">CR6-20137-S<button class="cp" data-clave="CR6-20137-S" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 1370 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado satinado a 2 caras</div>
+          </div>
+        </div>
+        <div id="p-CR6-20152-S" class="card" data-pg="3">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado satinado de 6 mm</div>
+            <div class="clave">CR6-20152-S<button class="cp" data-clave="CR6-20152-S" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 1520 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado satinado a 2 caras</div>
+          </div>
+        </div>
+        <div id="p-CR6-20167-S" class="card" data-pg="3">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado satinado de 6 mm</div>
+            <div class="clave">CR6-20167-S<button class="cp" data-clave="CR6-20167-S" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 1670 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado satinado a 2 caras</div>
+          </div>
+        </div>
+        <div id="p-CR6-20183-S" class="card" data-pg="3">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado satinado de 6 mm</div>
+            <div class="clave">CR6-20183-S<button class="cp" data-clave="CR6-20183-S" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 1830 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado satinado a 2 caras</div>
+          </div>
+        </div>
+        <div id="p-CR6-30610-S" class="card" data-pg="3">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado satinado de 6 mm</div>
+            <div class="clave">CR6-30610-S<button class="cp" data-clave="CR6-30610-S" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 610 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado satinado a 2 caras</div>
+          </div>
+        </div>
+        <div id="p-CR6-30760-S" class="card" data-pg="3">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado satinado de 6 mm</div>
+            <div class="clave">CR6-30760-S<button class="cp" data-clave="CR6-30760-S" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 760 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado satinado a 2 caras</div>
+          </div>
+        </div>
+        <div id="p-CR6-30910-S" class="card" data-pg="3">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado satinado de 6 mm</div>
+            <div class="clave">CR6-30910-S<button class="cp" data-clave="CR6-30910-S" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 910 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado satinado a 2 caras</div>
+          </div>
+        </div>
+        <div id="p-CR6-30107-S" class="card" data-pg="3">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado satinado de 6 mm</div>
+            <div class="clave">CR6-30107-S<button class="cp" data-clave="CR6-30107-S" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 1070 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado satinado a 2 caras</div>
+          </div>
+        </div>
+        <div id="p-CR6-30122-S" class="card" data-pg="3">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado satinado de 6 mm</div>
+            <div class="clave">CR6-30122-S<button class="cp" data-clave="CR6-30122-S" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 1220 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado satinado a 2 caras</div>
+          </div>
+        </div>
+        <div id="p-CR6-30137-S" class="card" data-pg="3">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado satinado de 6 mm</div>
+            <div class="clave">CR6-30137-S<button class="cp" data-clave="CR6-30137-S" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 1370 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado satinado a 2 caras</div>
+          </div>
+        </div>
+        <div id="p-CR6-30152-S" class="card" data-pg="3">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado satinado de 6 mm</div>
+            <div class="clave">CR6-30152-S<button class="cp" data-clave="CR6-30152-S" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 1520 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado satinado a 2 caras</div>
+          </div>
+        </div>
+        <div id="p-CR6-30167-S" class="card" data-pg="3">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado satinado de 6 mm</div>
+            <div class="clave">CR6-30167-S<button class="cp" data-clave="CR6-30167-S" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 1670 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado satinado a 2 caras</div>
+          </div>
+        </div>
+        <div id="p-CR6-30183-S" class="card" data-pg="3">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado satinado de 6 mm</div>
+            <div class="clave">CR6-30183-S<button class="cp" data-clave="CR6-30183-S" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 1830 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado satinado a 2 caras</div>
+          </div>
+        </div>
+        <div id="p-CR6-40610-S" class="card" data-pg="3">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado satinado de 6 mm</div>
+            <div class="clave">CR6-40610-S<button class="cp" data-clave="CR6-40610-S" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 610 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado satinado a 2 caras</div>
+          </div>
+        </div>
+        <div id="p-CR6-40760-S" class="card" data-pg="3">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado satinado de 6 mm</div>
+            <div class="clave">CR6-40760-S<button class="cp" data-clave="CR6-40760-S" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 760 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado satinado a 2 caras</div>
+          </div>
+        </div>
+        <div id="p-CR6-40910-S" class="card" data-pg="3">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado satinado de 6 mm</div>
+            <div class="clave">CR6-40910-S<button class="cp" data-clave="CR6-40910-S" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 910 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado satinado a 2 caras</div>
+          </div>
+        </div>
+        <div id="p-CR6-40107-S" class="card" data-pg="3">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado satinado de 6 mm</div>
+            <div class="clave">CR6-40107-S<button class="cp" data-clave="CR6-40107-S" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 1070 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado satinado a 2 caras</div>
+          </div>
+        </div>
+        <div id="p-CR6-40122-S" class="card" data-pg="3">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado satinado de 6 mm</div>
+            <div class="clave">CR6-40122-S<button class="cp" data-clave="CR6-40122-S" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 1220 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado satinado a 2 caras</div>
+          </div>
+        </div>
+        <div id="p-CR6-40137-S" class="card" data-pg="3">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado satinado de 6 mm</div>
+            <div class="clave">CR6-40137-S<button class="cp" data-clave="CR6-40137-S" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 1370 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado satinado a 2 caras</div>
+          </div>
+        </div>
+        <div id="p-CR6-40152-S" class="card" data-pg="4">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado satinado de 6 mm</div>
+            <div class="clave">CR6-40152-S<button class="cp" data-clave="CR6-40152-S" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 1520 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado satinado a 2 caras</div>
+          </div>
+        </div>
+        <div id="p-CR6-40167-S" class="card" data-pg="4">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado satinado de 6 mm</div>
+            <div class="clave">CR6-40167-S<button class="cp" data-clave="CR6-40167-S" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 1670 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado satinado a 2 caras</div>
+          </div>
+        </div>
+        <div id="p-CR6-40183-S" class="card" data-pg="4">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal templado satinado de 6 mm</div>
+            <div class="clave">CR6-40183-S<button class="cp" data-clave="CR6-40183-S" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 1830 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado satinado a 2 caras</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" id="VYCISA_CRISTAL_LAMINADO_3_3" data-proveedor="VYCISA">
+      <div class="section-header" style="background:#DA5B2B">
+        <span class="section-title">CRISTAL LAMINADO 3+3</span>
+        <span class="section-count">60 productos</span>
+      </div>
+      <div class="grid">
+        <div id="p-CR3-20610-B" class="card" data-pg="4">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-20610-B<button class="cp" data-clave="CR3-20610-B" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 610 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en blanco</div>
+          </div>
+        </div>
+        <div id="p-CR3-20610-CO" class="card" data-pg="5">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-20610-CO<button class="cp" data-clave="CR3-20610-CO" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 610 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en color por definir</div>
+          </div>
+        </div>
+        <div id="p-CR3-20760-B" class="card" data-pg="4">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-20760-B<button class="cp" data-clave="CR3-20760-B" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 760 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en blanco</div>
+          </div>
+        </div>
+        <div id="p-CR3-20760-CO" class="card" data-pg="5">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-20760-CO<button class="cp" data-clave="CR3-20760-CO" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 760 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en color por definir</div>
+          </div>
+        </div>
+        <div id="p-CR3-20910-B" class="card" data-pg="4">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-20910-B<button class="cp" data-clave="CR3-20910-B" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 910 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en blanco</div>
+          </div>
+        </div>
+        <div id="p-CR3-20910-CO" class="card" data-pg="5">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-20910-CO<button class="cp" data-clave="CR3-20910-CO" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 910 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en color por definir</div>
+          </div>
+        </div>
+        <div id="p-CR3-20100-CO" class="card" data-pg="10">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-20100-CO<button class="cp" data-clave="CR3-20100-CO" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 1000 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en color por definir</div>
+          </div>
+        </div>
+        <div id="p-CR3-20100-B" class="card" data-pg="10">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-20100-B<button class="cp" data-clave="CR3-20100-B" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 1000 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en blanco</div>
+          </div>
+        </div>
+        <div id="p-CR3-20107-B" class="card" data-pg="4">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-20107-B<button class="cp" data-clave="CR3-20107-B" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 1070 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en blanco</div>
+          </div>
+        </div>
+        <div id="p-CR3-20107-CO" class="card" data-pg="5">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-20107-CO<button class="cp" data-clave="CR3-20107-CO" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 1070 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en color por definir</div>
+          </div>
+        </div>
+        <div id="p-CR3-20122-B" class="card" data-pg="4">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-20122-B<button class="cp" data-clave="CR3-20122-B" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 1220 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en blanco</div>
+          </div>
+        </div>
+        <div id="p-CR3-20122-CO" class="card" data-pg="5">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-20122-CO<button class="cp" data-clave="CR3-20122-CO" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 1220 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en color por definir</div>
+          </div>
+        </div>
+        <div id="p-CR3-20137-B" class="card" data-pg="4">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-20137-B<button class="cp" data-clave="CR3-20137-B" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 1370 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en blanco</div>
+          </div>
+        </div>
+        <div id="p-CR3-20137-CO" class="card" data-pg="5">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-20137-CO<button class="cp" data-clave="CR3-20137-CO" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 1370 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en color por definir</div>
+          </div>
+        </div>
+        <div id="p-CR3-20152-B" class="card" data-pg="4">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-20152-B<button class="cp" data-clave="CR3-20152-B" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 1520 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en blanco</div>
+          </div>
+        </div>
+        <div id="p-CR3-20152-CO" class="card" data-pg="6">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-20152-CO<button class="cp" data-clave="CR3-20152-CO" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 1520 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en color por definir</div>
+          </div>
+        </div>
+        <div id="p-CR3-20167-B" class="card" data-pg="4">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-20167-B<button class="cp" data-clave="CR3-20167-B" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 1670 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en blanco</div>
+          </div>
+        </div>
+        <div id="p-CR3-20167-CO" class="card" data-pg="6">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-20167-CO<button class="cp" data-clave="CR3-20167-CO" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 1670 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en color por definir</div>
+          </div>
+        </div>
+        <div id="p-CR3-20183-B" class="card" data-pg="4">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-20183-B<button class="cp" data-clave="CR3-20183-B" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 1830 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en blanco</div>
+          </div>
+        </div>
+        <div id="p-CR3-20183-CO" class="card" data-pg="6">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-20183-CO<button class="cp" data-clave="CR3-20183-CO" title="Copiar clave">⧉</button></div>
+            <div class="dims">200 x 1830 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en color por definir</div>
+          </div>
+        </div>
+        <div id="p-CR3-30610-B" class="card" data-pg="4">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-30610-B<button class="cp" data-clave="CR3-30610-B" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 610 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en blanco</div>
+          </div>
+        </div>
+        <div id="p-CR3-30610-CO" class="card" data-pg="6">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-30610-CO<button class="cp" data-clave="CR3-30610-CO" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 610 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en color por definir</div>
+          </div>
+        </div>
+        <div id="p-CR3-30760-B" class="card" data-pg="4">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-30760-B<button class="cp" data-clave="CR3-30760-B" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 760 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en blanco</div>
+          </div>
+        </div>
+        <div id="p-CR3-30760-CO" class="card" data-pg="6">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-30760-CO<button class="cp" data-clave="CR3-30760-CO" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 760 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en color por definir</div>
+          </div>
+        </div>
+        <div id="p-CR3-30910-B" class="card" data-pg="4">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-30910-B<button class="cp" data-clave="CR3-30910-B" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 910 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en blanco</div>
+          </div>
+        </div>
+        <div id="p-CR3-30910-CO" class="card" data-pg="6">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-30910-CO<button class="cp" data-clave="CR3-30910-CO" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 910 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en color por definir</div>
+          </div>
+        </div>
+        <div id="p-CR3-30100-CO" class="card" data-pg="10">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-30100-CO<button class="cp" data-clave="CR3-30100-CO" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 1000 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en color por definir</div>
+          </div>
+        </div>
+        <div id="p-CR3-30100-B" class="card" data-pg="10">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-30100-B<button class="cp" data-clave="CR3-30100-B" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 1000 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en blanco</div>
+          </div>
+        </div>
+        <div id="p-CR3-30107-B" class="card" data-pg="4">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-30107-B<button class="cp" data-clave="CR3-30107-B" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 1070 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en blanco</div>
+          </div>
+        </div>
+        <div id="p-CR3-30107-CO" class="card" data-pg="6">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-30107-CO<button class="cp" data-clave="CR3-30107-CO" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 1070 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en color por definir</div>
+          </div>
+        </div>
+        <div id="p-CR3-30122-B" class="card" data-pg="4">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-30122-B<button class="cp" data-clave="CR3-30122-B" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 1220 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en blanco</div>
+          </div>
+        </div>
+        <div id="p-CR3-30122-CO" class="card" data-pg="6">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-30122-CO<button class="cp" data-clave="CR3-30122-CO" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 1220 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en color por definir</div>
+          </div>
+        </div>
+        <div id="p-CR3-30137-B" class="card" data-pg="4">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-30137-B<button class="cp" data-clave="CR3-30137-B" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 1370 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en blanco</div>
+          </div>
+        </div>
+        <div id="p-CR3-30137-CO" class="card" data-pg="6">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-30137-CO<button class="cp" data-clave="CR3-30137-CO" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 1370 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en color por definir</div>
+          </div>
+        </div>
+        <div id="p-CR3-30152-B" class="card" data-pg="5">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-30152-B<button class="cp" data-clave="CR3-30152-B" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 1520 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en blanco</div>
+          </div>
+        </div>
+        <div id="p-CR3-30152-CO" class="card" data-pg="6">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-30152-CO<button class="cp" data-clave="CR3-30152-CO" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 1520 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en color por definir</div>
+          </div>
+        </div>
+        <div id="p-CR3-30167-B" class="card" data-pg="5">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-30167-B<button class="cp" data-clave="CR3-30167-B" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 1670 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en blanco</div>
+          </div>
+        </div>
+        <div id="p-CR3-30167-CO" class="card" data-pg="6">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-30167-CO<button class="cp" data-clave="CR3-30167-CO" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 1670 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en color por definir</div>
+          </div>
+        </div>
+        <div id="p-CR3-30183-B" class="card" data-pg="5">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-30183-B<button class="cp" data-clave="CR3-30183-B" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 1830 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en blanco</div>
+          </div>
+        </div>
+        <div id="p-CR3-30183-CO" class="card" data-pg="6">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-30183-CO<button class="cp" data-clave="CR3-30183-CO" title="Copiar clave">⧉</button></div>
+            <div class="dims">300 x 1830 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en color por definir</div>
+          </div>
+        </div>
+        <div id="p-CR3-40610-B" class="card" data-pg="5">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-40610-B<button class="cp" data-clave="CR3-40610-B" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 610 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en blanco</div>
+          </div>
+        </div>
+        <div id="p-CR3-40610-CO" class="card" data-pg="6">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-40610-CO<button class="cp" data-clave="CR3-40610-CO" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 610 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en color por definir</div>
+          </div>
+        </div>
+        <div id="p-CR3-40760-B" class="card" data-pg="5">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-40760-B<button class="cp" data-clave="CR3-40760-B" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 760 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en blanco</div>
+          </div>
+        </div>
+        <div id="p-CR3-40760-CO" class="card" data-pg="6">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-40760-CO<button class="cp" data-clave="CR3-40760-CO" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 760 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en color por definir</div>
+          </div>
+        </div>
+        <div id="p-CR3-40910-B" class="card" data-pg="5">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-40910-B<button class="cp" data-clave="CR3-40910-B" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 910 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en blanco</div>
+          </div>
+        </div>
+        <div id="p-CR3-40910-CO" class="card" data-pg="6">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-40910-CO<button class="cp" data-clave="CR3-40910-CO" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 910 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en color por definir</div>
+          </div>
+        </div>
+        <div id="p-CR3-40100-CO" class="card" data-pg="10">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-40100-CO<button class="cp" data-clave="CR3-40100-CO" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 1000 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en color por definir</div>
+          </div>
+        </div>
+        <div id="p-CR3-40100-B" class="card" data-pg="10">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-40100-B<button class="cp" data-clave="CR3-40100-B" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 1000 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en blanco</div>
+          </div>
+        </div>
+        <div id="p-CR3-40107-B" class="card" data-pg="5">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-40107-B<button class="cp" data-clave="CR3-40107-B" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 1070 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en blanco</div>
+          </div>
+        </div>
+        <div id="p-CR3-40107-CO" class="card" data-pg="6">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-40107-CO<button class="cp" data-clave="CR3-40107-CO" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 1070 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en color por definir</div>
+          </div>
+        </div>
+        <div id="p-CR3-40122-B" class="card" data-pg="5">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-40122-B<button class="cp" data-clave="CR3-40122-B" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 1220 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en blanco</div>
+          </div>
+        </div>
+        <div id="p-CR3-40122-CO" class="card" data-pg="6">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-40122-CO<button class="cp" data-clave="CR3-40122-CO" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 1220 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en color por definir</div>
+          </div>
+        </div>
+        <div id="p-CR3-40137-B" class="card" data-pg="5">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-40137-B<button class="cp" data-clave="CR3-40137-B" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 1370 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en blanco</div>
+          </div>
+        </div>
+        <div id="p-CR3-40137-CO" class="card" data-pg="6">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-40137-CO<button class="cp" data-clave="CR3-40137-CO" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 1370 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en color por definir</div>
+          </div>
+        </div>
+        <div id="p-CR3-40152-B" class="card" data-pg="5">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-40152-B<button class="cp" data-clave="CR3-40152-B" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 1520 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en blanco</div>
+          </div>
+        </div>
+        <div id="p-CR3-40152-CO" class="card" data-pg="7">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-40152-CO<button class="cp" data-clave="CR3-40152-CO" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 1520 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en color por definir</div>
+          </div>
+        </div>
+        <div id="p-CR3-40167-B" class="card" data-pg="5">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-40167-B<button class="cp" data-clave="CR3-40167-B" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 1670 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en blanco</div>
+          </div>
+        </div>
+        <div id="p-CR3-40167-CO" class="card" data-pg="7">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-40167-CO<button class="cp" data-clave="CR3-40167-CO" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 1670 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en color por definir</div>
+          </div>
+        </div>
+        <div id="p-CR3-40183-B" class="card" data-pg="5">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-40183-B<button class="cp" data-clave="CR3-40183-B" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 1830 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en blanco</div>
+          </div>
+        </div>
+        <div id="p-CR3-40183-CO" class="card" data-pg="7">
+          <div class="card-img"><div class="no-img">—</div></div>
+          <div class="card-body">
+            <span class="grupo-badge grupo-vyc">VYC</span>
+            <div class="nombre">Cristal claro 3+3 no templado</div>
+            <div class="clave">CR3-40183-CO<button class="cp" data-clave="CR3-40183-CO" title="Copiar clave">⧉</button></div>
+            <div class="dims">400 x 1830 mm · Cantos pulidos y esquinas redondeadas a 10 mm · Acabado en color por definir</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="pie-vigencia">Vycisa — Lista Jul 2025 V3. Catálogo interno Haworth by Papsa; precios y disponibilidad sujetos a confirmación con el proveedor.</p>
+  </main>
+</div>
+<script id="imgdata" type="application/json">[]</script>
+<script>const PROV_LABEL = "Vycisa";
+const I = JSON.parse(document.getElementById('imgdata').textContent);
+document.querySelectorAll('img[data-i]').forEach(e => { e.src = I[+e.dataset.i]; });
+
+function filterCards() {
+  const q = document.getElementById('search').value.toLowerCase().trim();
+  let visible = 0;
+  document.querySelectorAll('.card').forEach(card => {
+    const match = !q || card.textContent.toLowerCase().includes(q);
+    card.style.display = match ? '' : 'none';
+    if (match) visible++;
+  });
+  document.getElementById('result-count').textContent = q
+    ? visible + ' resultado' + (visible !== 1 ? 's' : '') : '';
+  document.querySelectorAll('.section').forEach(sec => {
+    const vis = sec.querySelectorAll('.card:not([style*="none"])');
+    sec.style.display = vis.length === 0 && q ? 'none' : '';
+  });
+}
+
+let spy = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    document.querySelectorAll('.nav-pill').forEach(np =>
+      np.classList.toggle('current', np.getAttribute('href') === '#' + e.target.id));
+  });
+}, { rootMargin: '-15% 0px -70% 0px' });
+document.querySelectorAll('.section').forEach(s => spy.observe(s));
+
+const ficha = document.createElement('div');
+ficha.id = 'ficha';
+ficha.innerHTML = '<div class="ficha-wrap"><div class="ficha-box">' +
+  '<div class="ficha-img"><img id="f-img" alt=""></div>' +
+  '<div class="ficha-body"><div class="ficha-meta" id="f-meta"></div>' +
+  '<div class="ficha-nombre" id="f-nombre"></div>' +
+  '<div class="ficha-clave" id="f-clave"></div>' +
+  '<div class="ficha-dims" id="f-dims"></div>' +
+  '<button class="ficha-link" id="f-link">🔗 Copiar enlace de este producto</button></div></div>' +
+  '<button class="ficha-close">✕</button></div>';
+document.body.appendChild(ficha);
+ficha.querySelector('.ficha-close').onclick = () => ficha.classList.remove('open');
+ficha.addEventListener('click', e => { if (e.target === ficha) ficha.classList.remove('open'); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') ficha.classList.remove('open'); });
+
+let fichaCard = null;
+document.getElementById('f-link').onclick = () => {
+  if (!fichaCard) return;
+  const url = location.origin + location.pathname + '#' + fichaCard.id;
+  const b = document.getElementById('f-link');
+  try { navigator.clipboard.writeText(url); } catch (err) {
+    const ta = document.createElement('textarea'); ta.value = url; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); ta.remove();
+  }
+  b.textContent = '✓ Enlace copiado'; b.classList.add('ok');
+  setTimeout(() => { b.textContent = '🔗 Copiar enlace de este producto'; b.classList.remove('ok'); }, 1400);
+};
+
+document.addEventListener('click', e => {
+  const cp = e.target.closest('.cp');
+  if (cp) {
+    e.stopPropagation();
+    const t = cp.dataset.clave;
+    try { navigator.clipboard.writeText(t); } catch (err) {
+      const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta);
+      ta.select(); document.execCommand('copy'); ta.remove();
+    }
+    cp.textContent = '✓'; cp.classList.add('ok');
+    setTimeout(() => { cp.textContent = '⧉'; cp.classList.remove('ok'); }, 1100);
+    return;
+  }
+  const card = e.target.closest('.card');
+  if (!card) return;
+  fichaCard = card;
+  const img = card.querySelector('.card-img img');
+  const fimg = document.getElementById('f-img');
+  if (img && img.src) { fimg.src = img.src; fimg.parentElement.style.display = ''; }
+  else { fimg.parentElement.style.display = 'none'; }
+  const sec = card.closest('.section');
+  const pg = card.dataset.pg;
+  document.getElementById('f-meta').textContent = PROV_LABEL +
+    (sec ? ' · ' + sec.querySelector('.section-title').textContent.trim() : '') +
+    (pg ? ' · pág. ' + pg + ' de la lista' : '');
+  document.getElementById('f-nombre').textContent = card.querySelector('.nombre')?.textContent || '';
+  document.getElementById('f-clave').textContent = card.querySelector('.clave')?.textContent.replace('⧉','').replace('✓','').trim() || '';
+  document.getElementById('f-dims').textContent = card.querySelector('.dims')?.textContent || '';
+  ficha.classList.add('open');
+});
+
+function toggleView() {
+  const main = document.querySelector('.main');
+  const on = main.classList.toggle('tableview');
+  document.getElementById('viewtoggle').classList.toggle('active', on);
+  try { localStorage.setItem('vista', on ? 'tabla' : 'tarjetas'); } catch (e) {}
+}
+try {
+  if (localStorage.getItem('vista') === 'tabla') {
+    document.querySelector('.main').classList.add('tableview');
+    document.getElementById('viewtoggle').classList.add('active');
+  }
+} catch (e) {}
+
+const topbtn = document.createElement('button');
+topbtn.id = 'topbtn'; topbtn.textContent = '↑'; topbtn.title = 'Volver arriba';
+topbtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+document.body.appendChild(topbtn);
+window.addEventListener('scroll', () => topbtn.classList.toggle('show', window.scrollY > 600));
+
+// llegada con ?q= (búsqueda global) o #id (enlace directo a producto)
+const qs = new URLSearchParams(location.search).get('q');
+if (qs) { document.getElementById('search').value = qs; filterCards(); }
+if (location.hash) {
+  const el = document.getElementById(location.hash.slice(1));
+  if (el && el.classList.contains('card')) {
+    setTimeout(() => {
+      el.scrollIntoView({ block: 'center' });
+      el.classList.add('destacado');
+      setTimeout(() => el.classList.remove('destacado'), 4000);
+    }, 300);
+  }
+}
+</script>
+</body>
+</html>
