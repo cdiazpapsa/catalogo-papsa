@@ -3333,7 +3333,8 @@ ficha.innerHTML = '<div class="ficha-wrap"><div class="ficha-box">' +
   '<div class="ficha-nombre" id="f-nombre"></div>' +
   '<div class="ficha-clave" id="f-clave"></div>' +
   '<div class="ficha-dims" id="f-dims"></div>' +
-  '<button class="ficha-link" id="f-link">🔗 Copiar enlace de este producto</button></div></div>' +
+  '<button class="ficha-link" id="f-link">🔗 Copiar enlace de este producto</button>' +
+  '<a class="ficha-link" id="f-pdf" target="_blank" rel="noopener" style="display:none;text-decoration:none">📄 Ver cotización (PDF)</a></div></div>' +
   '<button class="ficha-close">✕</button></div>';
 document.body.appendChild(ficha);
 ficha.querySelector('.ficha-close').onclick = () => ficha.classList.remove('open');
@@ -3369,6 +3370,9 @@ document.addEventListener('click', e => {
   const card = e.target.closest('.card');
   if (!card) return;
   fichaCard = card;
+  const fpdf = document.getElementById('f-pdf');
+  if (card.dataset.pdf) { fpdf.href = card.dataset.pdf; fpdf.style.display = ''; }
+  else { fpdf.style.display = 'none'; }
   const img = card.querySelector('.card-img img');
   const fimg = document.getElementById('f-img');
   if (img && img.src) { fimg.src = img.src; fimg.parentElement.style.display = ''; }
