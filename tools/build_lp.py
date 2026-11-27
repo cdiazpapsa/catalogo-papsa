@@ -19,11 +19,12 @@ for p, (label, n_prod, n_acab, _) in S.items():
         for k, fn in enumerate(order):
             m = meta.get(fn, {}); tit = m.get('titulo', fn[:-4]); vig = m.get('vigencia', '')
             url = f'lp/{p}/{fn}'
-            tag = '<span class="lp-tag">Vigente</span>' if k == 0 else '<span class="lp-tag lp-old">Anterior</span>'
-            body += (f'      <div class="lp-item">{tag}<span class="lp-tit">{H.escape(tit)}</span>'
+            tg = m.get('tag', 'Vigente' if k == 0 else 'Anterior')
+            tag = f'<span class="lp-tag{"" if k == 0 else " lp-old"}">{H.escape(tg)}</span>'
+            body += (f'      <div class="lp-item" onclick="document.querySelector(\'.lp-view\').src=\'{url}#view=FitH\'">{tag}<span class="lp-tit">{H.escape(tit)}</span>'
                      f'<span class="lp-vig">{H.escape(vig)}</span>'
-                     f'<a class="lp-btn" href="{url}" target="_blank" rel="noopener">Abrir</a>'
-                     f'<a class="lp-btn lp-dl" href="{url}" download>Descargar</a></div>\n')
+                     f'<a class="lp-btn" onclick="event.stopPropagation()" href="{url}" target="_blank" rel="noopener">Abrir</a>'
+                     f'<a class="lp-btn lp-dl" onclick="event.stopPropagation()" href="{url}" download>Descargar</a></div>\n')
         body += '    </div>\n'
         body += f'    <iframe class="lp-view" src="lp/{p}/{order[0]}#view=FitH" title="Lista de precios {H.escape(label)}"></iframe>\n'
     else:
@@ -31,7 +32,7 @@ for p, (label, n_prod, n_acab, _) in S.items():
                 f'La lista de precios vigente de {H.escape(label)} se publicará aquí en PDF.</div>\n')
     css = '''<style>
 .lp-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
-.lp-item { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--border);
+.lp-item { cursor: pointer; display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--border);
   border-radius: 6px; padding: 12px 16px; }
 .lp-tag { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #fff;
   background: var(--dark-green); border-radius: 20px; padding: 3px 10px; }
