@@ -11,6 +11,12 @@
   0,
   []
  ],
+ "andreuworld": [
+  "Andreu World",
+  0,
+  0,
+  []
+ ],
  "byrneesp": [
   "Byrne Especiales",
   54,
@@ -53,17 +59,31 @@
   0,
   []
  ],
+ "hwseating": [
+  "Haworth | Seating",
+  279,
+  0,
+  []
+ ],
  "hwmx": [
   "HWMX Metropolitan",
   9,
   0,
   []
  ],
- "hwseating": [
-  "Haworth | Seating",
-  279,
+ "nardi": [
+  "HWMX Nardi",
+  57,
   0,
   []
+ ],
+ "wemeet": [
+  "HWMX WeMeet",
+  25,
+  133,
+  [
+   "WEMEET_ACABADOS"
+  ]
  ],
  "labenze": [
   "Labenze",
@@ -71,6 +91,14 @@
   18,
   [
    "LABENZE_TELAS_GRADO_PAPSA_No_recomendadas_para_proyectos_de_alto_volumen_de_piezas"
+  ]
+ ],
+ "panorama": [
+  "Labenze | Panorama",
+  90,
+  18,
+  [
+   "PANORAMA_TELAS_GRADO_PAPSA_No_recomendadas_para_proyectos_de_alto_volumen_de_piezas"
   ]
  ],
  "lospatrones": [
@@ -92,20 +120,6 @@
   203,
   0,
   []
- ],
- "nardi": [
-  "HWMX Nardi",
-  57,
-  0,
-  []
- ],
- "panorama": [
-  "Labenze | Panorama",
-  90,
-  18,
-  [
-   "PANORAMA_TELAS_GRADO_PAPSA_No_recomendadas_para_proyectos_de_alto_volumen_de_piezas"
-  ]
  ],
  "quinti": [
   "Quinti",
@@ -142,13 +156,5 @@
   117,
   0,
   []
- ],
- "wemeet": [
-  "HWMX WeMeet",
-  25,
-  133,
-  [
-   "WEMEET_ACABADOS"
-  ]
  ]
 }

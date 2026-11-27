@@ -49,38 +49,42 @@ TAB_CSS = '''
 .empty-state b { display: block; color: var(--petrol); font-size: 1rem; margin-bottom: 6px; }
 '''
 
-pages = sorted(f for f in glob.glob(R + '*.html') if not re.search(r'(index|-acabados|-lp)\.html$', f))
-summary = {}
-for f in pages:
-    p = os.path.basename(f)[:-5]
-    h = open(f).read()
-    if os.path.exists(R + p + '-acabados.html'):
-        continue
-    if TAB_CSS.strip()[:20] not in h:
-        h = h.replace('</style>', TAB_CSS + '</style>', 1)
-    pre, secs, post = parts(h)
-    prod = [(i, s) for i, s in secs if not FIN.search(i)]
-    acab = [(i, s) for i, s in secs if FIN.search(i)]
-    n_prod = sum(ncards(s) for _, s in prod); n_acab = sum(ncards(s) for _, s in acab)
-    label = re.search(r'<span class="prov-current">([^<]*)</span>', h).group(1)
-    def nav_only(pre, keep):
-        def f(m): return m.group(0) if m.group(1) in keep else ''
-        return re.sub(r'\n    <a href="#([^"]+)" class="nav-pill"[^>]*>[^<]*</a>', f, pre)
-    search_anchor = '    <div class="search-wrap">'
-    # Productos
-    pp = nav_only(pre, {i for i, _ in prod}).replace(search_anchor, '    ' + tabs(p, '', n_prod, n_acab) + search_anchor, 1)
-    open(f, 'w').write(trim_imgs(pp + ''.join(s for _, s in prod) + post))
-    # Acabados
-    pa = nav_only(pre, {i for i, _ in acab}).replace(search_anchor, '    ' + tabs(p, '-acabados', n_prod, n_acab) + search_anchor, 1)
-    pa = pa.replace(f'<span class="prov-current">{label}</span>', f'<span class="prov-current">{label} · Acabados</span>')
-    pa = re.sub(r'placeholder="Buscar en [^"]*"', f'placeholder="Buscar acabados de {H.escape(label)} por clave, color o línea…"', pa)
-    if acab:
-        body = ''.join(s for _, s in acab)
-    else:
-        body = (f'    <div class="empty-state"><b>Acabados pendientes de cargar</b>'
-                f'Los acabados de {H.escape(label)} se publicarán aquí al cargar el muestrario o la lista vigente del proveedor.</div>\n\n')
-        pa = pa.replace(pa[pa.find(search_anchor):], '', 0)
-    open(R + p + '-acabados.html', 'w').write(trim_imgs(pa + body + post))
-    summary[p] = (label, n_prod, n_acab, [i for i, _ in acab])
-json.dump(summary, open(R + 'tools/split_summary.json', 'w'), ensure_ascii=False, indent=1)
-print(json.dumps({k: v[1:3] for k, v in summary.items()}))
+def main():
+    pages = sorted(f for f in glob.glob(R + '*.html') if not re.search(r'(index|-acabados|-lp)\.html$', f))
+    summary = {}
+    for f in pages:
+        p = os.path.basename(f)[:-5]
+        h = open(f).read()
+        if os.path.exists(R + p + '-acabados.html'):
+            continue
+        if TAB_CSS.strip()[:20] not in h:
+            h = h.replace('</style>', TAB_CSS + '</style>', 1)
+        pre, secs, post = parts(h)
+        prod = [(i, s) for i, s in secs if not FIN.search(i)]
+        acab = [(i, s) for i, s in secs if FIN.search(i)]
+        n_prod = sum(ncards(s) for _, s in prod); n_acab = sum(ncards(s) for _, s in acab)
+        label = re.search(r'<span class="prov-current">([^<]*)</span>', h).group(1)
+        def nav_only(pre, keep):
+            def f(m): return m.group(0) if m.group(1) in keep else ''
+            return re.sub(r'\n    <a href="#([^"]+)" class="nav-pill"[^>]*>[^<]*</a>', f, pre)
+        search_anchor = '    <div class="search-wrap">'
+        # Productos
+        pp = nav_only(pre, {i for i, _ in prod}).replace(search_anchor, '    ' + tabs(p, '', n_prod, n_acab) + search_anchor, 1)
+        open(f, 'w').write(trim_imgs(pp + ''.join(s for _, s in prod) + post))
+        # Acabados
+        pa = nav_only(pre, {i for i, _ in acab}).replace(search_anchor, '    ' + tabs(p, '-acabados', n_prod, n_acab) + search_anchor, 1)
+        pa = pa.replace(f'<span class="prov-current">{label}</span>', f'<span class="prov-current">{label} · Acabados</span>')
+        pa = re.sub(r'placeholder="Buscar en [^"]*"', f'placeholder="Buscar acabados de {H.escape(label)} por clave, color o línea…"', pa)
+        if acab:
+            body = ''.join(s for _, s in acab)
+        else:
+            body = (f'    <div class="empty-state"><b>Acabados pendientes de cargar</b>'
+                    f'Los acabados de {H.escape(label)} se publicarán aquí al cargar el muestrario o la lista vigente del proveedor.</div>\n\n')
+            pa = pa.replace(pa[pa.find(search_anchor):], '', 0)
+        open(R + p + '-acabados.html', 'w').write(trim_imgs(pa + body + post))
+        summary[p] = (label, n_prod, n_acab, [i for i, _ in acab])
+    if summary: json.dump(summary, open(R + 'tools/split_summary.json', 'w'), ensure_ascii=False, indent=1)
+    print(json.dumps({k: v[1:3] for k, v in summary.items()}))
+
+if __name__ == '__main__':
+    main()
