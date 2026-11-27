@@ -1,0 +1,154 @@
+{
+ "ais": [
+  "AIS",
+  36,
+  0,
+  []
+ ],
+ "allermuir": [
+  "Allermuir",
+  1236,
+  0,
+  []
+ ],
+ "byrneesp": [
+  "Byrne Especiales",
+  54,
+  0,
+  []
+ ],
+ "dimob": [
+  "Dimob",
+  96,
+  0,
+  []
+ ],
+ "emeco": [
+  "Emeco",
+  201,
+  7,
+  [
+   "EMECO_SEAT_PAD_UPHOLSTERY",
+   "EMECO_NAVY_OFFICER_UPHOLSTERY",
+   "EMECO_ON_ON_UPHOLSTERY"
+  ]
+ ],
+ "forma": [
+  "Forma",
+  766,
+  170,
+  [
+   "FORMA_ACABADOS_DE_MADERA_GRADO_A",
+   "FORMA_ACABADOS_DE_MADERA_GRADO_B",
+   "FORMA_ACABADOS_DE_MADERA_GRADO_C",
+   "FORMA_TELAS_GRADO_A",
+   "FORMA_TELAS_GRADO_B",
+   "FORMA_PINTURA_ELECTROSTÁTICA_GRADO_A",
+   "FORMA_PINTURA_ELECTROSTÁTICA_GRADO_B"
+  ]
+ ],
+ "formaesp": [
+  "Forma Especiales",
+  1139,
+  0,
+  []
+ ],
+ "hwmx": [
+  "HWMX Metropolitan",
+  9,
+  0,
+  []
+ ],
+ "hwseating": [
+  "Haworth | Seating",
+  279,
+  0,
+  []
+ ],
+ "labenze": [
+  "Labenze",
+  426,
+  18,
+  [
+   "LABENZE_TELAS_GRADO_PAPSA_No_recomendadas_para_proyectos_de_alto_volumen_de_piezas"
+  ]
+ ],
+ "lospatrones": [
+  "Los Patrones",
+  57,
+  0,
+  []
+ ],
+ "made": [
+  "Made Design",
+  153,
+  34,
+  [
+   "MADE_ACABADOS"
+  ]
+ ],
+ "nacionalbancas": [
+  "Nacional de Bancas",
+  203,
+  0,
+  []
+ ],
+ "nardi": [
+  "HWMX Nardi",
+  57,
+  0,
+  []
+ ],
+ "panorama": [
+  "Labenze | Panorama",
+  90,
+  18,
+  [
+   "PANORAMA_TELAS_GRADO_PAPSA_No_recomendadas_para_proyectos_de_alto_volumen_de_piezas"
+  ]
+ ],
+ "quinti": [
+  "Quinti",
+  878,
+  0,
+  []
+ ],
+ "requiez": [
+  "Requiez",
+  315,
+  0,
+  []
+ ],
+ "stockmerx": [
+  "Stock Merx",
+  15,
+  0,
+  []
+ ],
+ "technochairs": [
+  "Technochairs",
+  487,
+  0,
+  []
+ ],
+ "vaiven": [
+  "Vaivén",
+  236,
+  0,
+  []
+ ],
+ "vycisa": [
+  "Vycisa",
+  117,
+  0,
+  []
+ ],
+ "wemeet": [
+  "HWMX WeMeet",
+  25,
+  133,
+  [
+   "WEMEET_ACABADOS"
+  ]
+ ]
+}

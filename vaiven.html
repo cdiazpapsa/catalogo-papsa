@@ -315,6 +315,19 @@ body { font-family: var(--font); background: var(--bg); color: var(--text-hi); }
 }
 .ficha-link.ok { background: var(--dark-green); }
 .pie-vigencia { margin: 10px 2px 30px; font-size: 0.66rem; color: var(--text-lo); }
+
+/* ── PESTAÑAS POR PROVEEDOR ── */
+.prov-tabs { display: flex; gap: 6px; margin: 0 0 16px; border-bottom: 2px solid var(--border); flex-wrap: wrap; }
+.ptab { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; margin-bottom: -2px;
+  font-size: 0.74rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none;
+  color: var(--text-mid); border-bottom: 3px solid transparent; }
+.ptab:hover { color: var(--dark-blue); }
+.ptab.active { color: var(--petrol); border-bottom-color: var(--bright-red); }
+.ptab-n { font-size: 0.64rem; color: #fff; background: var(--text-lo); border-radius: 20px; padding: 2px 8px; }
+.ptab.active .ptab-n { background: var(--petrol); }
+.empty-state { background: var(--surface); border: 1px dashed var(--border); border-radius: 6px; padding: 48px 24px;
+  text-align: center; color: var(--text-mid); font-size: 0.9rem; line-height: 1.5; }
+.empty-state b { display: block; color: var(--petrol); font-size: 1rem; margin-bottom: 6px; }
 </style>
 </head>
 <body>
@@ -340,17 +353,17 @@ body { font-family: var(--font); background: var(--bg); color: var(--text-hi); }
 <a class="prov-item" href="allermuir.html">Allermuir<span class="pi-n">1236</span></a>
 <a class="prov-item" href="byrneesp.html">Byrne Especiales<span class="pi-n">54</span></a>
 <a class="prov-item" href="dimob.html">Dimob<span class="pi-n">96</span></a>
-<a class="prov-item" href="emeco.html">Emeco<span class="pi-n">208</span></a>
-<a class="prov-item" href="forma.html">Forma<span class="pi-n">936</span></a>
+<a class="prov-item" href="emeco.html">Emeco<span class="pi-n">201</span></a>
+<a class="prov-item" href="forma.html">Forma<span class="pi-n">766</span></a>
 <a class="prov-item" href="formaesp.html">Forma Especiales<span class="pi-n">1139</span></a>
 <a class="prov-item" href="hwseating.html">Haworth | Seating<span class="pi-n">279</span></a>
 <a class="prov-item" href="hwmx.html">HWMX Metropolitan<span class="pi-n">9</span></a>
 <a class="prov-item" href="nardi.html">HWMX Nardi<span class="pi-n">57</span></a>
-<a class="prov-item" href="wemeet.html">HWMX WeMeet<span class="pi-n">158</span></a>
-<a class="prov-item" href="labenze.html">Labenze<span class="pi-n">444</span></a>
-<a class="prov-item" href="panorama.html">Labenze | Panorama<span class="pi-n">108</span></a>
+<a class="prov-item" href="wemeet.html">HWMX WeMeet<span class="pi-n">25</span></a>
+<a class="prov-item" href="labenze.html">Labenze<span class="pi-n">426</span></a>
+<a class="prov-item" href="panorama.html">Labenze | Panorama<span class="pi-n">90</span></a>
 <a class="prov-item" href="lospatrones.html">Los Patrones<span class="pi-n">57</span></a>
-<a class="prov-item" href="made.html">Made Design<span class="pi-n">187</span></a>
+<a class="prov-item" href="made.html">Made Design<span class="pi-n">153</span></a>
 <a class="prov-item" href="nacionalbancas.html">Nacional de Bancas<span class="pi-n">203</span></a>
 <a class="prov-item" href="quinti.html">Quinti<span class="pi-n">878</span></a>
 <a class="prov-item" href="requiez.html">Requiez<span class="pi-n">315</span></a>
@@ -369,6 +382,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text-hi); }
     </div>
   </nav>
   <main class="main">
+    <nav class="prov-tabs"><a class="ptab active" href="vaiven.html">Catálogo de productos<span class="ptab-n">236</span></a><a class="ptab" href="vaiven-acabados.html">Acabados<span class="ptab-n">0</span></a><a class="ptab" href="vaiven-lp.html">Lista de precios</a></nav>
     <div class="search-wrap">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
